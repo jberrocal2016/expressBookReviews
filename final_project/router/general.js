@@ -24,25 +24,36 @@ public_users.post("/register", (req, res) => {
   return res.status(201).json({ message: "User registered successfully" });
 });
 
-// Get the book list available in the shop
+// Get the book list available in the shop (async)
 public_users.get("/", async (req, res) => {
   try {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate delay
-    if (!books) throw "Books data not found";
+
+    // Return books data after delay
     res.status(200).json(books);
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 });
 
-// Get book details based on ISBN
-public_users.get("/isbn/:isbn", function (req, res) {
-  const isbn = req.params.isbn;
+// Get book details based on ISBN (async)
+public_users.get("/isbn/:isbn", async (req, res) => {
+  try {
+    const isbn = req.params.isbn;
 
-  if (books[isbn]) {
-    return res.status(200).json(books[isbn]);
-  } else {
-    return res.status(404).json({ message: "Book not found" });
+    const booksData = await new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (books[isbn]) {
+          resolve(books[isbn]);
+        } else {
+          reject(new Error("Book not found"));
+        }
+      }, 1000); // Simulate delay
+    });
+
+    res.status(200).json(booksData);
+  } catch (error) {
+    res.status(404).json({ message: error.message || "Internal Server Error" });
   }
 });
 
