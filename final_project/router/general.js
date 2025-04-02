@@ -79,17 +79,25 @@ public_users.get("/author/:author", async (req, res) => {
   }
 });
 
-// Get all books based on title
-public_users.get("/title/:title", function (req, res) {
-  const searchTitle = req.params.title.trim().toLocaleLowerCase(); // Normalize input
-  let booksByTitle = Object.values(books).filter(
-    (book) => book.title.toLocaleLowerCase().includes(searchTitle) // Case-insensitive & partial match
-  );
+// Get all books based on title (async-await)
+public_users.get("/title/:title", async (req, res) => {
+  try {
+    const searchTitle = req.params.title.trim().toLocaleLowerCase(); // Normalize input
 
-  if (booksByTitle.length > 0) {
-    return res.status(200).json(booksByTitle);
-  } else {
-    return res.status(404).json({ message: "No books found with this title" });
+    // Simulate a delay using setTimeout
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const booksByTitle = Object.values(books).filter(
+      (book) => book.title.toLocaleLowerCase().includes(searchTitle) // Case-insensitive & partial match
+    );
+
+    if (booksByTitle.length > 0) {
+      res.status(200).json(booksByTitle);
+    } else {
+      res.status(404).json({ message: "No books found with this title" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 });
 
